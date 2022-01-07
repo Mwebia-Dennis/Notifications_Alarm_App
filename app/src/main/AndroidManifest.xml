@@ -36,6 +36,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".Scheduler.NotificationAlertScheduler">
+            <intent-filter>
+                <action android:name="com.penguinstech.notificationsalarmapp.scheduler.reminder"/>
+            </intent-filter>
+        </receiver>
+
         <service android:name=".Scheduler.SchedulerService"
             android:enabled="true"
             >

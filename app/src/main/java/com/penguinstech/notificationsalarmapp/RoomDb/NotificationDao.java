@@ -14,6 +14,9 @@ public interface NotificationDao {
     List<MyNotification> getAll();
 
 
+    @Query("SELECT * FROM mynotification where id = :id")
+    MyNotification getNotificationById(int id);
+
     @Query("SELECT * FROM mynotification where time > :currentMidnight AND time < :nextDayMidnight")
     List<MyNotification> getTodayNotifications(String currentMidnight, String nextDayMidnight);
 

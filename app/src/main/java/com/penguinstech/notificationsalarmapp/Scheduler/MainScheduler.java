@@ -13,23 +13,63 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+import androidx.room.Room;
 
+import com.penguinstech.notificationsalarmapp.NotificationAdapter;
 import com.penguinstech.notificationsalarmapp.R;
+import com.penguinstech.notificationsalarmapp.RoomDb.AppDatabase;
+import com.penguinstech.notificationsalarmapp.RoomDb.Constants;
+import com.penguinstech.notificationsalarmapp.RoomDb.MyNotification;
 
+import java.text.ParseException;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainScheduler extends BroadcastReceiver {
 
-//    public MainScheduler() {
+    public MainScheduler() {
 //        android.os.Debug.waitForDebugger();
-//    }
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        //send notification
-        Log.i("received", "true");
-        showNotification(context, "Notification Alert", 1);
+        AppDatabase db = Room.databaseBuilder(context,
+                AppDatabase.class, Constants.DATABASE_NAME).build();//load room db
+        //get all notifications between specific dates
+        new Thread(()->{
+
+            Calendar midnight = Calendar.getInstance();
+
+            Calendar nextDayMidnight = (Calendar) midnight.clone();
+            nextDayMidnight.add(Calendar.MINUTE, 10);
+            List<MyNotification> notificationList = db
+                    .notificationDao()
+                    .getTodayNotifications(NotificationAdapter.sdf.format(midnight.getTime()),
+                            NotificationAdapter.sdf.format(nextDayMidnight.getTime())
+                    );//get list of data
+            for (MyNotification myNotification : notificationList){
+                //for eaach notification set up a broadcast to show notification
+                Calendar time = Calendar.getInstance();
+                try {
+                    time.setTime(NotificationAdapter.sdf.parse(myNotification.time));
+                    if (time.compareTo(Calendar.getInstance()) > 0) {//if the notification time is beyond current time, set notification
+
+                        Calendar _2_minsBefore = (Calendar) time.clone();
+                        //todo: set 30 mins before and 5 mins before
+                        time.add(Calendar.MINUTE, -5);//5 mins before
+                        _2_minsBefore.add(Calendar.MINUTE, -2);//2 mins before
+                        NotificationAlertScheduler alertScheduler = new NotificationAlertScheduler();
+                        alertScheduler.setScheduler(context, time, myNotification.id);
+                        alertScheduler.setScheduler(context, _2_minsBefore, myNotification.id);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    Log.i("error:time parse", e.getMessage());
+                }
+
+            }
+        }).start();
     }
 
     public void setScheduler(Context context) {
@@ -44,10 +84,10 @@ public class MainScheduler extends BroadcastReceiver {
             Calendar midnight = Calendar.getInstance();
 //            midnight.set(Calendar.HOUR_OF_DAY, 12);
 //            midnight.set(Calendar.AM_PM, Calendar.AM);
-            midnight.set(Calendar.HOUR, 9);
-            midnight.set(Calendar.MINUTE, 50);
+            midnight.set(Calendar.HOUR, 1);
+            midnight.set(Calendar.MINUTE, 0);
             midnight.set(Calendar.SECOND, 0);
-            midnight.set(Calendar.AM_PM, Calendar.AM);
+            midnight.set(Calendar.AM_PM, Calendar.PM);
 
             AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(context, MainScheduler.class);
@@ -78,32 +118,4 @@ public class MainScheduler extends BroadcastReceiver {
     }
 
 
-    private void showNotification(Context context, String message, int notifId) {
-
-        final String NOTIFICATION_CHANNEL_ID = "com.penguinstech.notificationsalarmapp.scheduler";
-        final String channelName = "Scheduler Notifications";
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O){
-            NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
-            chan.setLightColor(Color.BLUE);
-            chan.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-
-            NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            assert manager != null;
-            manager.createNotificationChannel(chan);
-        }
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
-        notificationBuilder
-                .setContentTitle("New Appointment Request")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setOngoing(false)
-                .setCategory(Notification.CATEGORY_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_MIN);
-        }
-        NotificationManager mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(notifId, notificationBuilder.build());
-    }
 }

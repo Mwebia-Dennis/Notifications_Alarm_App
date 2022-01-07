@@ -54,13 +54,12 @@ import java.util.TimeZone;
             Calendar nextDayMidnight = (Calendar) midnight.clone();
             nextDayMidnight.add(Calendar.DATE, 1);
 
-            Log.i("date", NotificationAdapter.sdf.format(nextDayMidnight.getTime()));
+//            Log.i("date", NotificationAdapter.sdf.format(nextDayMidnight.getTime()));
             List<MyNotification> notificationList = db
                     .notificationDao()
                     .getTodayNotifications(NotificationAdapter.sdf.format(midnight.getTime()),
                             NotificationAdapter.sdf.format(nextDayMidnight.getTime())
                     );//get list of data
-            Log.i("size", String.valueOf(notificationList.size()));
             runOnUiThread(() -> {
                 recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false));
                 NotificationAdapter notificationAdapter = new NotificationAdapter(this, notificationList);
