@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Notifications Alarm App</string>
+    <string name="add_notification">Add Notification</string>
+    <string name="new_notification">New Notification</string>
+    <string name="message">message</string>
+    <string name="set_reminder_time">Set Reminder Time</string>
+    <string name="save">Save</string>
+    <string name="message_1">Message 1</string>
+    <string name="reminder_08_00_am">reminder: 08:00 am</string>
+    <string name="refresh">refresh</string>
 </resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/addNotification"
+        android:title="@string/add_notification"
+        android:icon="@drawable/ic_baseline_add_24"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:id="@+id/refresh"
+        android:title="@string/refresh"
+        android:icon="@drawable/ic_baseline_refresh_24"
+        app:showAsAction="ifRoom"
+        />
+
+</menu>

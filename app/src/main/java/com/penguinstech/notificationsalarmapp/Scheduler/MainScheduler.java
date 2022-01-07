@@ -44,10 +44,10 @@ public class MainScheduler extends BroadcastReceiver {
             Calendar midnight = Calendar.getInstance();
 //            midnight.set(Calendar.HOUR_OF_DAY, 12);
 //            midnight.set(Calendar.AM_PM, Calendar.AM);
-            midnight.set(Calendar.HOUR, 6);
-            midnight.set(Calendar.MINUTE, 0);
+            midnight.set(Calendar.HOUR, 9);
+            midnight.set(Calendar.MINUTE, 50);
             midnight.set(Calendar.SECOND, 0);
-            midnight.set(Calendar.AM_PM, Calendar.PM);
+            midnight.set(Calendar.AM_PM, Calendar.AM);
 
             AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(context, MainScheduler.class);
