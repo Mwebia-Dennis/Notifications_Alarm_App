@@ -50,18 +50,19 @@ public class MainScheduler extends BroadcastReceiver {
                     );//get list of data
             for (MyNotification myNotification : notificationList){
                 //for eaach notification set up a broadcast to show notification
-                Calendar time = Calendar.getInstance();
+                Calendar _30_minsBefore = Calendar.getInstance();
                 try {
-                    time.setTime(NotificationAdapter.sdf.parse(myNotification.time));
-                    if (time.compareTo(Calendar.getInstance()) > 0) {//if the notification time is beyond current time, set notification
+                    _30_minsBefore.setTime(NotificationAdapter.sdf.parse(myNotification.time));
+                    if (_30_minsBefore.compareTo(Calendar.getInstance()) > 0) {//if the notification time is beyond current time, set notification
 
-                        Calendar _2_minsBefore = (Calendar) time.clone();
-                        //todo: set 30 mins before and 5 mins before
-                        time.add(Calendar.MINUTE, -5);//5 mins before
-                        _2_minsBefore.add(Calendar.MINUTE, -2);//2 mins before
+                        Calendar _5_minsBefore = (Calendar) _30_minsBefore.clone();
+                        // set 30 mins before and 5 mins before
+                        _30_minsBefore.add(Calendar.MINUTE, -30);//30 mins before
+                        _5_minsBefore.add(Calendar.MINUTE, -5);//5 mins before
+//                        _2_minsBefore.add(Calendar.MINUTE, -2);//2 mins before
                         NotificationAlertScheduler alertScheduler = new NotificationAlertScheduler();
-                        alertScheduler.setScheduler(context, time, myNotification.id);
-                        alertScheduler.setScheduler(context, _2_minsBefore, myNotification.id);
+                        alertScheduler.setScheduler(context, _30_minsBefore, myNotification.id);
+                        alertScheduler.setScheduler(context, _5_minsBefore, myNotification.id);
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -82,12 +83,12 @@ public class MainScheduler extends BroadcastReceiver {
             //set up the alarm manager and the reference point ie pending intent
             //set repeating scheduler which repeats after 24 hours at midnight
             Calendar midnight = Calendar.getInstance();
-//            midnight.set(Calendar.HOUR_OF_DAY, 12);
-//            midnight.set(Calendar.AM_PM, Calendar.AM);
-            midnight.set(Calendar.HOUR, 1);
+            midnight.set(Calendar.HOUR_OF_DAY, 12);
+            midnight.set(Calendar.AM_PM, Calendar.AM);
+//            midnight.set(Calendar.HOUR, 1);
             midnight.set(Calendar.MINUTE, 0);
             midnight.set(Calendar.SECOND, 0);
-            midnight.set(Calendar.AM_PM, Calendar.PM);
+//            midnight.set(Calendar.AM_PM, Calendar.PM);
 
             AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(context, MainScheduler.class);
@@ -97,7 +98,8 @@ public class MainScheduler extends BroadcastReceiver {
             PendingIntent pi = PendingIntent.getBroadcast(context, 0,
                     intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);//note flag_update_current which tells system how to handle new and existing pending intent
-            am.setRepeating(AlarmManager.RTC_WAKEUP, midnight.getTimeInMillis(), 1000 * 60 * 10, pi); // Millisec * Second * Minute
+            am.setRepeating(AlarmManager.RTC_WAKEUP,
+                    midnight.getTimeInMillis(), 1000 * 60 * 60, pi); // Millisec * Second * Minute  = 1 hour
 
         }
     }

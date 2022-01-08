@@ -1,11 +1,13 @@
 package com.penguinstech.notificationsalarmapp;
 
+import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -17,12 +19,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.penguinstech.notificationsalarmapp.RoomDb.AppDatabase;
 import com.penguinstech.notificationsalarmapp.RoomDb.MyNotification;
 
+import java.time.Year;
 import java.util.Calendar;
 import java.util.TimeZone;
 
 public class NewNotificationBottomSheet extends BottomSheetDialogFragment {
 
-    Calendar calendar = null;
+    Calendar calendar = Calendar.getInstance();
     AppDatabase db;
 
     public NewNotificationBottomSheet(AppDatabase db) {
@@ -39,7 +42,6 @@ public class NewNotificationBottomSheet extends BottomSheetDialogFragment {
         final TimePickerDialog timePickerDialog = new TimePickerDialog(
                 getContext(),
                 (timePicker,selectedHour, selectedMinute) -> {
-                    calendar = Calendar.getInstance();
                     calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
                     calendar.set(Calendar.MINUTE, selectedMinute);
                 },
@@ -52,6 +54,7 @@ public class NewNotificationBottomSheet extends BottomSheetDialogFragment {
 
             timePickerDialog.show();
         });
+
 
         v.findViewById(R.id.saveNotificationBtn).setOnClickListener(view->{
 

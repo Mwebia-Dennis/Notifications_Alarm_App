@@ -25,7 +25,7 @@ public class SchedulerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        mainScheduler.setScheduler(this);
+        mainScheduler.setScheduler(this);//start our main repeating scheduler
         return START_STICKY;
     }
 
