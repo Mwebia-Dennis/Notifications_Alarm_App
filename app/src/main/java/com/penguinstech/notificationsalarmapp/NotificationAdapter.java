@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.penguinstech.notificationsalarmapp.RoomDb.MyNotification;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
@@ -41,7 +43,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         MyNotification notification = notificationList.get(position);
         holder.msgTv.setText(notification.message);
-        holder.timeTv.setText(notification.time);
+        sdf.setTimeZone(TimeZone.getDefault());
+        try {
+            holder.timeTv.setText(sdf.format(sdf.parse(notification.time)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
 

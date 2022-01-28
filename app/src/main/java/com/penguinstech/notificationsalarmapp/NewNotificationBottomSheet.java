@@ -72,6 +72,7 @@ public class NewNotificationBottomSheet extends BottomSheetDialogFragment {
                 new Thread(()->{
 
                     //insert to local database
+                    NotificationAdapter.sdf.setTimeZone(TimeZone.getTimeZone("UTC"));//set timezone to UTC
                     db.notificationDao()
                             .insertAll(new MyNotification(
                                     NotificationAdapter.sdf.format(calendar.getTime()),

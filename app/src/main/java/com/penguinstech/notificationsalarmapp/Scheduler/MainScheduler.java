@@ -24,6 +24,7 @@ import com.penguinstech.notificationsalarmapp.RoomDb.MyNotification;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class MainScheduler extends BroadcastReceiver {
 
@@ -43,6 +44,7 @@ public class MainScheduler extends BroadcastReceiver {
 
             Calendar nextDayMidnight = (Calendar) midnight.clone();
             nextDayMidnight.add(Calendar.MINUTE, 10);
+            NotificationAdapter.sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             List<MyNotification> notificationList = db
                     .notificationDao()
                     .getTodayNotifications(NotificationAdapter.sdf.format(midnight.getTime()),
@@ -52,13 +54,14 @@ public class MainScheduler extends BroadcastReceiver {
                 //for eaach notification set up a broadcast to show notification
                 Calendar _30_minsBefore = Calendar.getInstance();
                 try {
+                    NotificationAdapter.sdf.setTimeZone(TimeZone.getDefault());
                     _30_minsBefore.setTime(NotificationAdapter.sdf.parse(myNotification.time));
                     if (_30_minsBefore.compareTo(Calendar.getInstance()) > 0) {//if the notification time is beyond current time, set notification
 
                         Calendar _5_minsBefore = (Calendar) _30_minsBefore.clone();
                         // set 30 mins before and 5 mins before
                         _30_minsBefore.add(Calendar.MINUTE, -30);//30 mins before
-                        _5_minsBefore.add(Calendar.MINUTE, -5);//5 mins before
+                        _5_minsBefore.add(Calendar.MINUTE, -5);//5 mins befo
 //                        _2_minsBefore.add(Calendar.MINUTE, -2);//2 mins before
                         NotificationAlertScheduler alertScheduler = new NotificationAlertScheduler();
                         alertScheduler.setScheduler(context, _30_minsBefore, myNotification.id);
