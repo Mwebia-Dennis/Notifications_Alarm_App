@@ -38,7 +38,7 @@ public class NewNotificationBottomSheet extends BottomSheetDialogFragment {
         View v = inflater.inflate(R.layout.new_notification_layout,
                 container, false);
 
-        Calendar mCalendar = Calendar.getInstance();
+        Calendar mCalendar = Calendar.getInstance(TimeZone.getDefault());
         final TimePickerDialog timePickerDialog = new TimePickerDialog(
                 getContext(),
                 (timePicker,selectedHour, selectedMinute) -> {

@@ -24,7 +24,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     private final List<MyNotification> notificationList;
     private final Context context;
-    public static final DateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+    public static final DateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 
     public NotificationAdapter (Context context, List<MyNotification> notificationList) {
         this.notificationList = notificationList;

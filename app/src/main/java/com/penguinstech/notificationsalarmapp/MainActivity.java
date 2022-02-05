@@ -6,9 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -16,7 +14,6 @@ import com.penguinstech.notificationsalarmapp.RoomDb.AppDatabase;
 import com.penguinstech.notificationsalarmapp.RoomDb.Constants;
 import com.penguinstech.notificationsalarmapp.RoomDb.MyNotification;
 import com.penguinstech.notificationsalarmapp.Scheduler.MainScheduler;
-import com.penguinstech.notificationsalarmapp.Scheduler.SchedulerService;
 
 import java.util.Calendar;
 import java.util.List;
@@ -38,7 +35,8 @@ import java.util.TimeZone;
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, Constants.DATABASE_NAME).build();//load room db
         recyclerView = findViewById(R.id.mainRv);
-        this.startService(new Intent(this, SchedulerService.class));//start the scheduler service
+//        this.startService(new Intent(this, SchedulerService.class));//start the scheduler service
+        new MainScheduler().setScheduler(MainActivity.this);
         loadNotifications();//update ui
     }
 
@@ -46,7 +44,7 @@ import java.util.TimeZone;
 
         new Thread(()->{
 //            List<MyNotification> notificationList = db.notificationDao().getAll();//get list of data
-            Calendar midnight = Calendar.getInstance();
+            Calendar midnight = Calendar.getInstance(TimeZone.getDefault());
             midnight.set(Calendar.HOUR_OF_DAY, 0);
             midnight.set(Calendar.MINUTE, 0);
             midnight.set(Calendar.SECOND, 0);
@@ -54,6 +52,7 @@ import java.util.TimeZone;
             Calendar nextDayMidnight = (Calendar) midnight.clone();
             nextDayMidnight.add(Calendar.DATE, 1);
 
+            NotificationAdapter.sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 //            Log.i("date", NotificationAdapter.sdf.format(nextDayMidnight.getTime()));
             List<MyNotification> notificationList = db
                     .notificationDao()

@@ -44,11 +44,6 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".Scheduler.SchedulerService"
-            android:enabled="true"
-            >
-
-        </service>
     </application>
 
 </manifest>

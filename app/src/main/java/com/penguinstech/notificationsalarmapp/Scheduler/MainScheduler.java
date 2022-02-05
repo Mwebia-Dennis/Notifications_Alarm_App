@@ -24,6 +24,7 @@ import com.penguinstech.notificationsalarmapp.RoomDb.MyNotification;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class MainScheduler extends BroadcastReceiver {
@@ -42,9 +43,15 @@ public class MainScheduler extends BroadcastReceiver {
 
             Calendar midnight = Calendar.getInstance();
 
+            midnight.set(Calendar.HOUR_OF_DAY, 0);
+            midnight.set(Calendar.MINUTE, 0);
+            midnight.set(Calendar.SECOND, 0);
+            midnight.set(Calendar.MILLISECOND, 0);
             Calendar nextDayMidnight = (Calendar) midnight.clone();
-            nextDayMidnight.add(Calendar.MINUTE, 10);
+            nextDayMidnight.add(Calendar.DATE, 1);
             NotificationAdapter.sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Log.i("midnight", NotificationAdapter.sdf.format(midnight.getTime()));
+            Log.i("next_midnight", NotificationAdapter.sdf.format(nextDayMidnight.getTime()));
             List<MyNotification> notificationList = db
                     .notificationDao()
                     .getTodayNotifications(NotificationAdapter.sdf.format(midnight.getTime()),
@@ -52,21 +59,16 @@ public class MainScheduler extends BroadcastReceiver {
                     );//get list of data
             for (MyNotification myNotification : notificationList){
                 //for eaach notification set up a broadcast to show notification
-                Calendar _30_minsBefore = Calendar.getInstance();
+                Calendar time = Calendar.getInstance();
                 try {
+                    NotificationAdapter.sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    time.setTime(Objects.requireNonNull(NotificationAdapter.sdf.parse(myNotification.time)));
+                    //since time is in UTC we have to convert to user timezone
                     NotificationAdapter.sdf.setTimeZone(TimeZone.getDefault());
-                    _30_minsBefore.setTime(NotificationAdapter.sdf.parse(myNotification.time));
-                    if (_30_minsBefore.compareTo(Calendar.getInstance()) > 0) {//if the notification time is beyond current time, set notification
-
-                        Calendar _5_minsBefore = (Calendar) _30_minsBefore.clone();
-                        // set 30 mins before and 5 mins before
-                        _30_minsBefore.add(Calendar.MINUTE, -30);//30 mins before
-                        _5_minsBefore.add(Calendar.MINUTE, -5);//5 mins befo
-//                        _2_minsBefore.add(Calendar.MINUTE, -2);//2 mins before
-                        NotificationAlertScheduler alertScheduler = new NotificationAlertScheduler();
-                        alertScheduler.setScheduler(context, _30_minsBefore, myNotification.id);
-                        alertScheduler.setScheduler(context, _5_minsBefore, myNotification.id);
-                    }
+                    time.setTime(Objects.requireNonNull(NotificationAdapter.sdf.parse(NotificationAdapter.sdf.format(time.getTime()))));
+                    NotificationAlertScheduler alertScheduler = new NotificationAlertScheduler();
+                    Log.i("time", NotificationAdapter.sdf.format(time.getTime()));
+                    alertScheduler.setScheduler(context, time, myNotification.id);
                 } catch (ParseException e) {
                     e.printStackTrace();
                     Log.i("error:time parse", e.getMessage());
@@ -86,11 +88,11 @@ public class MainScheduler extends BroadcastReceiver {
             //set up the alarm manager and the reference point ie pending intent
             //set repeating scheduler which repeats after 24 hours at midnight
             Calendar midnight = Calendar.getInstance();
-            midnight.set(Calendar.HOUR_OF_DAY, 12);
-            midnight.set(Calendar.AM_PM, Calendar.AM);
-//            midnight.set(Calendar.HOUR, 1);
+            midnight.set(Calendar.HOUR_OF_DAY, 0);
             midnight.set(Calendar.MINUTE, 0);
             midnight.set(Calendar.SECOND, 0);
+//            midnight.set(Calendar.AM_PM, Calendar.AM);
+//            midnight.set(Calendar.HOUR, 1);
 //            midnight.set(Calendar.AM_PM, Calendar.PM);
 
             AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
@@ -102,7 +104,7 @@ public class MainScheduler extends BroadcastReceiver {
                     intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);//note flag_update_current which tells system how to handle new and existing pending intent
             am.setRepeating(AlarmManager.RTC_WAKEUP,
-                    midnight.getTimeInMillis(), 1000 * 60 * 60, pi); // Millisec * Second * Minute  = 1 hour
+                    midnight.getTimeInMillis(), 1000 * 60 * 1, pi); // Millisec * Second * Minute  = 1 hour
 
         }
     }
@@ -113,14 +115,7 @@ public class MainScheduler extends BroadcastReceiver {
                 PendingIntent.FLAG_NO_CREATE) != null);
     }
 
-    public void cancelScheduler(Context context)
-    {
-        //cancelling the scheduler when needed
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(PendingIntent.getBroadcast(context, 0,
-                new Intent(context, MainScheduler.class),
-                PendingIntent.FLAG_UPDATE_CURRENT));
-    }
+
 
 
 }

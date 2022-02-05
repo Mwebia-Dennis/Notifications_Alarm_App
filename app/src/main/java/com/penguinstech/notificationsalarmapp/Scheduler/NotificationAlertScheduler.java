@@ -14,12 +14,16 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 import androidx.room.Room;
 
+import com.penguinstech.notificationsalarmapp.NotificationAdapter;
 import com.penguinstech.notificationsalarmapp.R;
 import com.penguinstech.notificationsalarmapp.RoomDb.AppDatabase;
 import com.penguinstech.notificationsalarmapp.RoomDb.Constants;
 import com.penguinstech.notificationsalarmapp.RoomDb.MyNotification;
 
+import java.math.BigInteger;
 import java.util.Calendar;
+import java.util.Objects;
+import java.util.TimeZone;
 
 public class NotificationAlertScheduler extends BroadcastReceiver {
 
@@ -41,8 +45,28 @@ public class NotificationAlertScheduler extends BroadcastReceiver {
 
 
     public void setScheduler(Context context, Calendar time, int requestCode) {
+        if (time.compareTo(Calendar.getInstance()) > 0) {//if the notification time is beyond current time, set notification
+
+            Calendar _30_minsBefore = (Calendar) time.clone();
+            Calendar _5_minsBefore = (Calendar) _30_minsBefore.clone();
+            // set 30 mins before and 5 mins before
+            _30_minsBefore.add(Calendar.MINUTE, -30);//30 mins before
+            _5_minsBefore.add(Calendar.MINUTE, -5);//5 mins befo
+//                        _2_minsBefore.add(Calendar.MINUTE, -2);//2 mins before
+            if(_30_minsBefore.compareTo(Calendar.getInstance()) > 0) {
+                setReminder(context, _30_minsBefore, requestCode);
+            }
+            if(_5_minsBefore.compareTo(Calendar.getInstance()) > 0) {
+                setReminder(context, _5_minsBefore, requestCode);
+            }else {
+                setReminder(context, time, requestCode);
+            }
+        }
 
 
+    }
+
+    private void setReminder(Context context, Calendar time, int requestCode) {
         //check if the scheduler has been set
         //if not set the scheduler
         if (!isSchedulerSet(context, requestCode))
@@ -65,6 +89,24 @@ public class NotificationAlertScheduler extends BroadcastReceiver {
         return (PendingIntent.getBroadcast(context, requestCode,
                 new Intent(context, NotificationAlertScheduler.class),
                 PendingIntent.FLAG_NO_CREATE) != null);
+    }
+
+    public void updateScheduler(Context context, Calendar time, int requestCode)
+    {
+        if(isSchedulerSet(context, requestCode)) {
+            cancelScheduler(context,requestCode);
+        }
+        setScheduler(context, time, requestCode);
+
+    }
+
+    public void cancelScheduler(Context context,int requestCode)
+    {
+        //cancelling the scheduler when needed
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(PendingIntent.getBroadcast(context, requestCode,
+                new Intent(context, MainScheduler.class),
+                PendingIntent.FLAG_UPDATE_CURRENT));
     }
 
 
