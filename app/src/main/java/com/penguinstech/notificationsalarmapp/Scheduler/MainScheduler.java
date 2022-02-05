@@ -104,7 +104,7 @@ public class MainScheduler extends BroadcastReceiver {
                     intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);//note flag_update_current which tells system how to handle new and existing pending intent
             am.setRepeating(AlarmManager.RTC_WAKEUP,
-                    midnight.getTimeInMillis(), 1000 * 60 * 1, pi); // Millisec * Second * Minute  = 1 hour
+                    midnight.getTimeInMillis(), 1000 * 60 * 10, pi); // Millisec * Second * Minute  = 1 hour
 
         }
     }

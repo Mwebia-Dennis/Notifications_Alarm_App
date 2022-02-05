@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
@@ -45,7 +46,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.msgTv.setText(notification.message);
         sdf.setTimeZone(TimeZone.getDefault());
         try {
-            holder.timeTv.setText(sdf.format(sdf.parse(notification.time)));
+
+            Calendar time = Calendar.getInstance();
+            NotificationAdapter.sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            time.setTime(Objects.requireNonNull(NotificationAdapter.sdf.parse(notification.time)));
+            NotificationAdapter.sdf.setTimeZone(TimeZone.getDefault());
+            time.setTime(Objects.requireNonNull(NotificationAdapter.sdf.parse(NotificationAdapter.sdf.format(time.getTime()))));
+            holder.timeTv.setText(NotificationAdapter.sdf.format(time.getTime()));
         } catch (ParseException e) {
             e.printStackTrace();
         }
