@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -25,7 +26,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     private final List<MyNotification> notificationList;
     private final Context context;
-    public static final DateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+    public static final DateFormat sdf = new SimpleDateFormat("dd-M-yyyy HH:mm:ss", Locale.ENGLISH);
 
     public NotificationAdapter (Context context, List<MyNotification> notificationList) {
         this.notificationList = notificationList;

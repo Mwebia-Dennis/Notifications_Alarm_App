@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.room.Room;
@@ -45,19 +46,23 @@ public class NotificationAlertScheduler extends BroadcastReceiver {
 
 
     public void setScheduler(Context context, Calendar time, int requestCode) {
+
         if (time.compareTo(Calendar.getInstance()) > 0) {//if the notification time is beyond current time, set notification
 
             Calendar _30_minsBefore = (Calendar) time.clone();
             Calendar _5_minsBefore = (Calendar) _30_minsBefore.clone();
             // set 30 mins before and 5 mins before
             _30_minsBefore.add(Calendar.MINUTE, -30);//30 mins before
+            Log.i("30 mins", NotificationAdapter.sdf.format(_30_minsBefore.getTime()));
             _5_minsBefore.add(Calendar.MINUTE, -5);//5 mins befo
 //                        _2_minsBefore.add(Calendar.MINUTE, -2);//2 mins before
             if(_30_minsBefore.compareTo(Calendar.getInstance()) > 0) {
+                //since we cannot use same requestCode for 2 notification
+                // we create an unique code for
                 setReminder(context, _30_minsBefore, requestCode);
             }
             if(_5_minsBefore.compareTo(Calendar.getInstance()) > 0) {
-                setReminder(context, _5_minsBefore, requestCode);
+                setReminder(context, _5_minsBefore, getUniqueCode(requestCode));
             }else {
                 setReminder(context, time, requestCode);
             }
@@ -137,5 +142,10 @@ public class NotificationAlertScheduler extends BroadcastReceiver {
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(notifId, notificationBuilder.build());
+    }
+    public static int getUniqueCode(int requestCode) {
+        //add a very big integer to the request code to maintain uniqueness
+        //get int value
+        return BigInteger.valueOf(1000000000 + requestCode).intValue();
     }
 }
